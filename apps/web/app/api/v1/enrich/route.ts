@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { validateApiKey } from '@/lib/auth';
 import { createJob, runJob, getJob } from '@leadpure/worker';
-import { getCachedEnrichment, writeEnrichment, hashInput } from '@/lib/db';
+import { getCachedEnrichment, writeEnrichment } from '@/lib/db';
 import { checkRateLimit } from '@/lib/rate-limit';
 
 const schema = z

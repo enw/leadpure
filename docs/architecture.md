@@ -128,44 +128,61 @@ Client polls GET /v1/batches/:batch_id for progress and results.
 ```
 leadpure/
 ├── apps/
-│   ├── api/              # Next.js app (API routes + frontend)
-│   │   ├── app/          # App Router pages
-│   │   │   ├── api/
-│   │   │   │   ├── v1/
-│   │   │   │   │   ├── enrich/route.ts
-│   │   │   │   │   ├── jobs/route.ts
-│   │   │   │   │   ├── batches/route.ts
-│   │   │   │   │   └── webhook/stripe/route.ts
-│   │   │   │   └── ...
-│   │   │   ├── page.tsx      # Landing page
-│   │   │   ├── pricing/page.tsx
-│   │   │   └── docs/page.tsx
-│   │   └── lib/
-│   │       ├── db.ts         # Postgres connection
-│   │       ├── auth.ts       # API key validation
-│   │       ├── usage.ts      # Billing metering
-│   │       └── stripe.ts     # Stripe client
-│   └── worker/           # Bun worker process
-│       ├── index.ts      # Worker entrypoint + queue
-│       ├── scrapers/
-│       │   ├── crunchbase.ts
-│       │   ├── linkedin.ts
-│       │   ├── github.ts
-│       │   ├── builtwith.ts
-│       │   └── website.ts
-│       └── aggregator.ts  # Merge + dedupe + confidence
+│   └── web/                 # Next.js app (API routes + landing page)
+│       ├── app/
+│       │   ├── layout.tsx
+│       │   ├── page.tsx      # Landing page
+│       │   ├── globals.css
+│       │   ├── docs/
+│       │   │   └── page.tsx  # API docs
+│       │   └── api/
+│       │       └── v1/
+│       │           ├── enrich/
+│       │           │   └── route.ts    # POST /api/v1/enrich
+│       │           ├── jobs/
+│       │           │   └── [id]/
+│       │           │       └── route.ts # GET /api/v1/jobs/:id
+│       │           └── keys/
+│       │               └── route.ts    # POST /api/v1/keys
+│       ├── components/
+│       │   ├── demo-box.tsx
+│       │   └── signup-box.tsx
+│       └── lib/
+│           ├── db.ts         # Postgres connection + cache helpers
+│           ├── auth.ts       # API key validation
+│           └── rate-limit.ts # In-memory rate limiter
+│   └── worker/               # Scraping workers (in-process)
+│       └── src/
+│           ├── index.ts      # Job system (createJob/runJob/getJob)
+│           ├── aggregator.ts # Merge + confidence
+│           └── scrapers/
+│               ├── crunchbase.ts  # Mock (MVP)
+│               ├── github.ts      # GitHub REST API
+│               └── website.ts     # cheerio parser
 ├── packages/
-│   └── core/             # Open-source enrichment engine
-│       ├── src/
-│       │   ├── enrich.ts # Core enrichment function
-│       │   └── types.ts  # TS types for enrichment
-│       └── package.json
-├── docs/                 # These docs
-├── package.json          # Workspace root (Bun workspaces)
-├── bun.lock
-├── docker-compose.yml    # Self-host mode
+│   └── core/                 # Shared types
+│       └── src/
+│           └── index.ts      # EnrichRequest, EnrichResult
+├── docs/                     # Planning docs
+├── specs/                    # Phase specs
+├── scripts/
+│   └── migrate.ts            # DB migration
+├── test/
+│   ├── api/
+│   │   ├── smoke.sh          # Shell smoke tests
+│   │   └── smoke.test.ts     # Bun API smoke tests
+│   └── unit/
+│       ├── aggregator.test.ts
+│       └── rate-limit.test.ts
+├── AGENTS.md
+├── CONTEXT.md
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+├── README.md
+├── package.json              # Workspace root
 ├── tsconfig.json
-└── README.md
+└── tsconfig.base.json
 ```
 
 ## Self-Host Mode
