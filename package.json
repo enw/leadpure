@@ -1,0 +1,14 @@
+{
+  "name": "leadpure",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev": "bun run --filter @leadpure/web dev",
+    "build": "bun run --filter @leadpure/web build",
+    "lint": "bun run --filter @leadpure/* lint",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
