@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       void writeEnrichment(
         parsed.email,
         parsed.domain,
-        current.result as Record<string, unknown>,
+        current.result as unknown as Record<string, unknown>,
         current.result.confidence,
       );
       return NextResponse.json(
