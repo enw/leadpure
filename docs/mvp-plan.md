@@ -27,29 +27,38 @@ Build the minimum viable LeadPure: a working enrichment API + landing page that 
 
 ## Sprint Tasks
 
-### Phase 1: Foundation (Day 1)
+### Phase 1: Foundation (Day 1) ✅
 
-- [ ] Scaffold Bun workspace (`leadpure/packages/core`, `leadpure/apps/api`, `leadpure/apps/worker`)
-- [ ] Set up TypeScript config, ESLint, Prettier
-- [ ] Set up Neon PostgreSQL (free tier) + initial schema
-- [ ] Create `POST /v1/enrich` route (shell — returns mock data)
-- [ ] Landing page skeleton (Next.js App Router, hero + interactive demo)
+- [x] Scaffold Bun workspace (`leadpure/packages/core`, `leadpure/apps/api`, `leadpure/apps/worker`)
+- [x] Set up TypeScript config, Prettier
+- [x] Create `POST /v1/enrich` route (shell — returns mock data)
+- [x] Landing page skeleton (Next.js App Router, hero + interactive demo)
 
-### Phase 2: Scraping Engine (Day 2-3)
+### Phase 2: Scraping Engine (Day 2-3) ✅
 
-- [ ] **Crunchbase scraper**: search company by domain, extract name, industry, funding, location
-- [ ] **GitHub scraper**: search user by email/name, extract profile, repos, tech languages
-- [ ] **Website parser**: fetch URL, extract `<title>`, meta description, blog feed, contact info
-- [ ] **Aggregator**: merge results, dedupe, compute confidence score
-- [ ] **Worker**: wire up in-process queue, process enrichments asynchronously
+- [x] **GitHub scraper**: search user by email/name, extract profile, repos, tech languages
+- [x] **Website parser**: fetch URL, extract `<title>`, meta description, social links
+- [x] **Crunchbase scraper**: mock data (real scrape blocked by anti-bot)
+- [x] **Aggregator**: merge results, dedupe, compute confidence score
+- [x] **Worker**: wire up in-process queue, process enrichments asynchronously
+- [x] Tests: unit tests (15) + API smoke tests (16)
 
-### Phase 3: Integration (Day 4)
+### Phase 3: Integration (Day 4) 🚧
 
-- [ ] Wire API → Worker → PostgreSQL pipeline end-to-end
-- [ ] Add cache check before scraping
-- [ ] Add `GET /v1/jobs/:id` for polling
-- [ ] API key generation + validation
-- [ ] Rate limiting (100 req/min for free, higher for paid)
+- [ ] **DB migration + schema setup**: `api_keys`, `enrichments`, `usage_log` tables (Neon PostgreSQL)
+- [ ] **Cache check before scrape**: check `enrichments` table by input_hash, return if valid (30-day TTL)
+- [ ] **Cache write after scrape**: insert/update enrichment result to DB after worker completes
+- [ ] **`GET /api/v1/jobs/:id`**: async polling endpoint for enrichments that exceed 10s synchronous wait
+- [ ] **API key DB validation**: unify dev key with real DB-backed key lookup
+- [ ] **Seed script**: `bun run seed` to create tables + insert dev key
+- [ ] **Rate limiting**: in-memory sliding window (100 req/min free tier, disabled without DB)
+- [ ] **Confidence fix**: don't count mock Crunchbase as a real data source in confidence calc
+
+**Lessons from Phase 2 affecting Phase 3:**
+- Mock Crunchbase always returns data, inflating confidence. Fix: exclude mock sources from confidence.
+- Worker uses in-memory job store. No persistence. With Postgres, jobs persist across restarts.
+- DB runs via dev `DATABASE_URL`. Dev mode works without it (graceful fallback).
+- Rate limit only active when DB is connected (prevents annoyance during dev).
 
 ### Phase 4: Landing Page (Day 5)
 

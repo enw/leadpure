@@ -135,3 +135,18 @@ describe('landing page', () => {
     expect(html.toLowerCase()).toContain('leadpure');
   });
 });
+
+describe('jobs endpoint', () => {
+  test('unknown job returns 404', async () => {
+    const res = await fetch(`${BASE}/api/v1/jobs/nonexistent-job-id`);
+    expect(res.status).toBe(404);
+  });
+
+  test('404 body has error field', async () => {
+    const res = await fetch(`${BASE}/api/v1/jobs/nonexistent-job-id`);
+    const body = await res.json();
+    expect(body).toHaveProperty('error');
+    expect(body).toHaveProperty('message');
+    expect(body.error).toBe('job_not_found');
+  });
+});
