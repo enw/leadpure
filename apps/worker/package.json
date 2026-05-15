@@ -1,0 +1,17 @@
+{
+  "name": "@leadpure/worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "lint": "bun run tsc --noEmit",
+    "dev": "bun run --watch src/index.ts"
+  },
+  "dependencies": {
+    "@leadpure/core": "workspace:*",
+    "cheerio": "^1.0.0",
+    "@neondatabase/serverless": "^1.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

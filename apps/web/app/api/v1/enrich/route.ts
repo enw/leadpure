@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { validateApiKey } from '@/lib/auth';
-import { enrich } from '@leadpure/core';
+import { createJob, runJob, getJob } from '@leadpure/worker';
 
 const schema = z
   .object({
@@ -40,8 +40,39 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Phase 1: always return mock data. Phase 2+: check cache, dispatch workers.
-  const result = enrich(parsed);
+  // Phase 2: create job, run it, poll for completion up to 10s
+  const job = createJob(parsed);
 
-  return NextResponse.json(result, { status: 200 });
+  // Fire and forget — runJob will update the job in-place
+  void runJob(job.id).catch(() => {});
+
+  // Poll for up to 10 seconds (20 attempts × 500ms)
+  const deadline = Date.now() + 10_000;
+  let lastStatus = 'pending';
+
+  while (Date.now() < deadline) {
+    const current = getJob(job.id);
+    if (!current) break;
+
+    lastStatus = current.status;
+
+    if (current.status === 'completed' && current.result) {
+      return NextResponse.json(current.result, { status: 200 });
+    }
+
+    if (current.status === 'failed') {
+      return NextResponse.json(
+        { error: 'enrichment_failed', message: current.error ?? 'Unknown error' },
+        { status: 500 },
+      );
+    }
+
+    await new Promise((r) => setTimeout(r, 500));
+  }
+
+  // Still processing after timeout — return 202 with job id
+  return NextResponse.json(
+    { job_id: job.id, status: lastStatus === 'processing' ? 'processing' : 'queued' },
+    { status: 202 },
+  );
 }
