@@ -43,16 +43,16 @@ Build the minimum viable LeadPure: a working enrichment API + landing page that 
 - [x] **Worker**: wire up in-process queue, process enrichments asynchronously
 - [x] Tests: unit tests (15) + API smoke tests (16)
 
-### Phase 3: Integration (Day 4) 🚧
+### Phase 3: Integration (Day 4) ✅
 
-- [ ] **DB migration + schema setup**: `api_keys`, `enrichments`, `usage_log` tables (Neon PostgreSQL)
-- [ ] **Cache check before scrape**: check `enrichments` table by input_hash, return if valid (30-day TTL)
-- [ ] **Cache write after scrape**: insert/update enrichment result to DB after worker completes
-- [ ] **`GET /api/v1/jobs/:id`**: async polling endpoint for enrichments that exceed 10s synchronous wait
-- [ ] **API key DB validation**: unify dev key with real DB-backed key lookup
-- [ ] **Seed script**: `bun run seed` to create tables + insert dev key
-- [ ] **Rate limiting**: in-memory sliding window (100 req/min free tier, disabled without DB)
-- [ ] **Confidence fix**: don't count mock Crunchbase as a real data source in confidence calc
+- [x] **DB migration + schema setup**: `api_keys`, `enrichments`, `usage_log` tables (Neon PostgreSQL)
+- [x] **Cache check before scrape**: check `enrichments` table by input_hash, return if valid (30-day TTL)
+- [x] **Cache write after scrape**: insert/update enrichment result to DB after worker completes
+- [x] **`GET /api/v1/jobs/:id`**: async polling endpoint for enrichments that exceed 10s synchronous wait
+- [x] **API key DB validation**: unify dev key with real DB-backed key lookup
+- [x] **Seed script**: `bun run seed` to create tables + insert dev key
+- [x] **Rate limiting**: in-memory sliding window (100 req/min free tier, disabled without DB)
+- [x] **Confidence fix**: don't count mock Crunchbase as a real data source in confidence calc
 
 **Lessons from Phase 2 affecting Phase 3:**
 - Mock Crunchbase always returns data, inflating confidence. Fix: exclude mock sources from confidence.
@@ -60,13 +60,16 @@ Build the minimum viable LeadPure: a working enrichment API + landing page that 
 - DB runs via dev `DATABASE_URL`. Dev mode works without it (graceful fallback).
 - Rate limit only active when DB is connected (prevents annoyance during dev).
 
-### Phase 4: Landing Page (Day 5)
+### Phase 4: Landing Page & Signup (Day 5) 🚧
 
-- [ ] Hero section: "Email enrichment. No lock-in. Open source."
-- [ ] Interactive demo box: type email → see enrichment result
-- [ ] Pricing section (announced, not yet functional Stripe)
-- [ ] "Get API Key" form (email → generated key shown once)
-- [ ] GitHub star link + "Self-host" CTA
+- [x] Hero section: "Email enrichment. No lock-in. Open source."
+- [x] Interactive demo box: type email → see enrichment result
+- [x] Pricing section (announced, not yet functional Stripe)
+- [x] GitHub star link
+- [ ] **API key generation endpoint** (`POST /api/v1/keys`): email → generated key, stored in DB
+- [ ] **"Get your API key" section**: email form on landing page → shows generated key once
+- [ ] **API docs page** (`/docs`): curl examples, response format, error codes
+- [ ] **Landing page polish**: responsive layout, better mobile, self-host CTA
 
 ### Phase 5: Polish & Deploy (Day 6)
 

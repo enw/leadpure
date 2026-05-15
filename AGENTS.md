@@ -16,7 +16,7 @@ Open-source email enrichment API. TypeScript (Bun/Next.js), cache-first PostgreS
 
 ## Workflow
 
-- **Current phase**: Phase 3 (Integration) on `phase-3-db-integration` branch
+- **Current phase**: Phase 4 (Signup & Landing) on `phase-4-signup-landing` branch
 - Trunk-based: `main` branch. Feature branches per phase.
 - Each phase: spec → branch → implement → PR → user validates → merge
 - PRs via `gh` CLI
