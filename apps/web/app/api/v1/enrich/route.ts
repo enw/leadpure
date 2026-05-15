@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { validateApiKey } from '@/lib/auth';
 import { createJob, runJob, getJob } from '@leadpure/worker';
+import { getCachedEnrichment, writeEnrichment, hashInput } from '@/lib/db';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 const schema = z
   .object({
@@ -40,7 +42,30 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Phase 2: create job, run it, poll for completion up to 10s
+  // Rate limit (skip if no DB — dev mode)
+  if (process.env.DATABASE_URL) {
+    if (!checkRateLimit(key.id)) {
+      return NextResponse.json(
+        { error: 'rate_limited', message: 'Too many requests. 100/min limit.' },
+        { status: 429 },
+      );
+    }
+  }
+
+  // Cache check
+  const cached = await getCachedEnrichment(parsed.email, parsed.domain);
+  if (cached) {
+    return NextResponse.json(
+      {
+        ...(cached.result as Record<string, unknown>),
+        cached: true,
+        cached_at: cached.cached_at,
+      },
+      { status: 200 },
+    );
+  }
+
+  // Miss — create job, run worker, poll for completion up to 10s
   const job = createJob(parsed);
 
   // Fire and forget — runJob will update the job in-place
@@ -57,7 +82,17 @@ export async function POST(req: NextRequest) {
     lastStatus = current.status;
 
     if (current.status === 'completed' && current.result) {
-      return NextResponse.json(current.result, { status: 200 });
+      // Write to cache (fire and forget)
+      void writeEnrichment(
+        parsed.email,
+        parsed.domain,
+        current.result as Record<string, unknown>,
+        current.result.confidence,
+      );
+      return NextResponse.json(
+        { ...current.result, cached: false, cached_at: null },
+        { status: 200 },
+      );
     }
 
     if (current.status === 'failed') {

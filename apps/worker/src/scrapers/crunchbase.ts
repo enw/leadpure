@@ -4,6 +4,7 @@ export interface CrunchbaseData {
   location: string;
   description: string;
   funding: string;
+  _isMock: true; // always true in MVP — real scraper would set false
 }
 
 /**
@@ -25,6 +26,7 @@ export async function scrapeCrunchbase(domain: string): Promise<CrunchbaseData |
       location: 'San Francisco, CA',
       description: `${companyName} is a technology company building innovative solutions.`,
       funding: '$10M - $50M',
+      _isMock: true,
     };
   } catch {
     return null;

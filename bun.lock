@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "leadpure",
+      "dependencies": {
+        "@neondatabase/serverless": "^1.1.0",
+      },
       "devDependencies": {
         "bun-types": "^1.3.14",
         "typescript": "^5",

@@ -53,7 +53,7 @@ function extractSocial(source: AggregateSources): EnrichResult['social'] {
 
 function calculateConfidence(source: AggregateSources): number {
   let sources = 0;
-  if (source.crunchbase) sources++;
+  if (source.crunchbase && !('_isMock' in source.crunchbase)) sources++;
   if (source.github) sources++;
   if (source.website) sources++;
   return Math.min(0.3 + sources * 0.25, 1.0);

@@ -41,37 +41,46 @@ describe('aggregator', () => {
   it('confidence is 0.55 with one source (crunchbase)', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: 'Acme', industry: 'Tech', location: 'SF', description: '', funding: '' },
+        crunchbase: { name: 'Acme', industry: 'Tech', location: 'SF', description: '', funding: '', _isMock: true } as const,
       }),
     );
-    expect(r.confidence).toBe(0.55);
+    expect(r.confidence).toBe(0.3);
   });
 
   it('confidence is 0.8 with two sources', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: 'Acme', industry: 'Tech', location: 'SF', description: '', funding: '' },
+        crunchbase: { name: 'Acme', industry: 'Tech', location: 'SF', description: '', funding: '', _isMock: true } as const,
         github: { username: 'acme', name: 'Acme Inc', bio: null, location: 'SF', company: null, blog: null, public_repos: 10, languages: ['TypeScript'], avatar_url: null },
       }),
     );
-    expect(r.confidence).toBe(0.8);
+    expect(r.confidence).toBe(0.55);
   });
 
   it('confidence is 1.0 with three sources', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: 'Acme', industry: 'Tech', location: 'SF', description: '', funding: '' },
+        crunchbase: { name: 'Acme', industry: 'Tech', location: 'SF', description: '', funding: '', _isMock: true } as const,
         github: { username: 'acme', name: 'Acme Inc', bio: null, location: 'SF', company: null, blog: null, public_repos: 10, languages: ['TypeScript'], avatar_url: null },
         website: { title: 'Acme Corp', description: 'A tech company', keywords: ['software'], social_links: [] },
       }),
     );
-    expect(r.confidence).toBe(1.0);
+    expect(r.confidence).toBe(0.8);
+  });
+
+  it('mock crunchbase does not inflate confidence', () => {
+    const r = aggregate(
+      makeSources({
+        crunchbase: { name: 'Acme', industry: 'Tech', location: 'SF', description: '', funding: '', _isMock: true } as const,
+      }),
+    );
+    expect(r.confidence).toBe(0.3);
   });
 
   it('name prefers GitHub over Crunchbase', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: 'CB Name', industry: '', location: '', description: '', funding: '' },
+        crunchbase: { name: 'CB Name', industry: '', location: '', description: '', funding: '', _isMock: true } as const,
         github: { username: 'ghuser', name: 'GH Name', bio: null, location: null, company: null, blog: null, public_repos: 0, languages: [], avatar_url: null },
       }),
     );
@@ -81,7 +90,7 @@ describe('aggregator', () => {
   it('name falls back to Crunchbase when GitHub has no name', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: 'CB Name', industry: '', location: '', description: '', funding: '' },
+        crunchbase: { name: 'CB Name', industry: '', location: '', description: '', funding: '', _isMock: true } as const,
         github: { username: 'ghuser', name: null, bio: null, location: null, company: null, blog: null, public_repos: 0, languages: [], avatar_url: null },
       }),
     );
@@ -91,7 +100,7 @@ describe('aggregator', () => {
   it('company prefers GitHub company field', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: 'CB Inc', industry: '', location: '', description: '', funding: '' },
+        crunchbase: { name: 'CB Inc', industry: '', location: '', description: '', funding: '', _isMock: true } as const,
         github: { username: 'ghuser', name: null, bio: null, location: null, company: 'GH Corp', blog: null, public_repos: 0, languages: [], avatar_url: null },
       }),
     );
@@ -101,7 +110,7 @@ describe('aggregator', () => {
   it('company falls back to Crunchbase name', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: 'CB Inc', industry: '', location: '', description: '', funding: '' },
+        crunchbase: { name: 'CB Inc', industry: '', location: '', description: '', funding: '', _isMock: true } as const,
         github: { username: 'ghuser', name: null, bio: null, location: null, company: null, blog: null, public_repos: 0, languages: [], avatar_url: null },
       }),
     );
@@ -111,7 +120,7 @@ describe('aggregator', () => {
   it('industry prefers Crunchbase over website keywords', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: '', industry: 'Enterprise Software', location: '', description: '', funding: '' },
+        crunchbase: { name: '', industry: 'Enterprise Software', location: '', description: '', funding: '', _isMock: true } as const,
         website: { title: '', description: '', keywords: ['SaaS'], social_links: [] },
       }),
     );
@@ -121,7 +130,7 @@ describe('aggregator', () => {
   it('industry falls back to website keywords', () => {
     const r = aggregate(
       makeSources({
-        crunchbase: { name: '', industry: '', location: '', description: '', funding: '' },
+        crunchbase: { name: '', industry: '', location: '', description: '', funding: '', _isMock: true } as const,
         website: { title: '', description: '', keywords: ['SaaS', 'cloud'], social_links: [] },
       }),
     );
