@@ -60,26 +60,25 @@ Build the minimum viable LeadPure: a working enrichment API + landing page that 
 - DB runs via dev `DATABASE_URL`. Dev mode works without it (graceful fallback).
 - Rate limit only active when DB is connected (prevents annoyance during dev).
 
-### Phase 4: Landing Page & Signup (Day 5) 🚧
+### Phase 4: Landing Page & Signup (Day 5) ✅
 
 - [x] Hero section: "Email enrichment. No lock-in. Open source."
 - [x] Interactive demo box: type email → see enrichment result
 - [x] Pricing section (announced, not yet functional Stripe)
 - [x] GitHub star link
-- [ ] **API key generation endpoint** (`POST /api/v1/keys`): email → generated key, stored in DB
-- [ ] **"Get your API key" section**: email form on landing page → shows generated key once
-- [ ] **API docs page** (`/docs`): curl examples, response format, error codes
-- [ ] **Landing page polish**: responsive layout, better mobile, self-host CTA
+- [x] **API key generation endpoint** (`POST /api/v1/keys`): email → generated key, stored in DB
+- [x] **"Get your API key" section**: email form on landing page → shows generated key once
+- [x] **API docs page** (`/docs`): curl examples, response format, error codes
+- [x] **Landing page polish**: responsive layout, better mobile, self-host CTA
 
-### Phase 5: Polish & Deploy (Day 6)
+### Phase 5: Polish & Deploy (Day 6) ✅
 
-- [ ] `docker-compose.yml` for self-hosters
-- [ ] Vercel deployment (API + frontend)
-- [ ] fly.io deployment (worker)
-- [ ] Domain setup (leadpure.dev or similar)
-- [ ] `.env.example` with all config vars
-- [ ] README with quick start, API docs, self-host instructions
-- [ ] Post on Hacker News, Indie Hackers, r/SaaS
+- [x] **`Dockerfile`**: multi-stage build for Next.js standalone
+- [x] **`docker-compose.yml`**: API + PostgreSQL, migration on start
+- [x] **`.env.example`**: all config vars documented
+- [x] **`README.md`**: quick start, API docs, self-host, deploy to Vercel
+- [x] **`next.config.ts`**: standalone output for Docker builds
+- [ ] Post on Hacker News, Indie Hackers, r/SaaS (user does this)
 
 ## What Each Phase Unblocked Looks Like
 
