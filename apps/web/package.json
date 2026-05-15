@@ -13,7 +13,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "@neondatabase/serverless": "^1.1.0",
-    "zod": "^3.24.4"
+    "zod": "^3.24.4",
+    "@leadpure/worker": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.15.17",
