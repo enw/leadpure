@@ -1,4 +1,5 @@
 import DemoBox from '../components/demo-box';
+import SignupBox from '../components/signup-box';
 
 export default function Home() {
   return (
@@ -29,6 +30,10 @@ export default function Home() {
         <DemoBox />
       </div>
 
+      <div id="signup">
+        <SignupBox />
+      </div>
+
       <section className="pricing-section">
         <h2>Pricing</h2>
         <p>Pay for what you use. No expiring credits.</p>
@@ -54,6 +59,8 @@ export default function Home() {
 
       <footer className="footer">
         <a href="https://github.com/enw/leadpure" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <span className="sep">·</span>
+        <a href="/docs">API Docs</a>
         <span className="sep">·</span>
         <span>MIT License</span>
         <span className="sep">·</span>

@@ -250,3 +250,152 @@ code, pre {
 .footer a:hover { color: #a1a1aa; }
 
 .footer .sep { margin: 0 0.75rem; }
+
+/* Signup section */
+.signup-section {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.signup-section h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.signup-section > p {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin: 0 0 1.5rem;
+}
+
+.signup-form {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.signup-input {
+  flex: 1;
+  background: #18181b;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: var(--fg);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.signup-input:focus { border-color: var(--accent); }
+
+.key-display {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.key-display code {
+  background: #18181b;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--accent);
+  word-break: break-all;
+}
+
+.key-examples {
+  max-width: 42rem;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.key-examples p {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.75rem;
+}
+
+/* Docs page */
+.docs-page {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 4rem 1rem;
+}
+
+.docs-page h1 {
+  font-size: 2rem;
+  margin: 0 0 2rem;
+}
+
+.docs-page h2 {
+  font-size: 1.25rem;
+  margin: 2rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.docs-page h3 {
+  font-size: 1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.docs-page h4 {
+  font-size: 0.875rem;
+  margin: 1rem 0 0.5rem;
+  color: var(--muted);
+}
+
+.docs-page p {
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.docs-page code {
+  background: #18181b;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+}
+
+.docs-page table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  margin: 1rem 0;
+}
+
+.docs-page th, .docs-page td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.docs-page th {
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .hero { padding: 4rem 1rem 2rem; }
+  .hero h1 { font-size: 2rem; }
+  .hero .actions { flex-direction: column; }
+  .signup-form { flex-direction: column; }
+  .demo-input-row { flex-direction: column; }
+  .key-display { flex-direction: column; }
+}
