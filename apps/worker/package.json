@@ -2,6 +2,7 @@
   "name": "@leadpure/worker",
   "version": "0.1.0",
   "private": true,
+  "main": "src/index.ts",
   "scripts": {
     "lint": "bun run tsc --noEmit",
     "dev": "bun run --watch src/index.ts"
