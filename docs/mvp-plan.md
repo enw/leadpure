@@ -71,13 +71,13 @@ Build the minimum viable LeadPure: a working enrichment API + landing page that 
 - [x] **API docs page** (`/docs`): curl examples, response format, error codes
 - [x] **Landing page polish**: responsive layout, better mobile, self-host CTA
 
-### Phase 5: Polish & Deploy (Day 6) 🚧
+### Phase 5: Polish & Deploy (Day 6) ✅
 
-- [ ] **`Dockerfile`**: multi-stage build for Next.js standalone
-- [ ] **`docker-compose.yml`**: API + PostgreSQL, migration on start
-- [ ] **`.env.example`**: all config vars documented
-- [ ] **`README.md`**: quick start, API docs, self-host, deploy to Vercel
-- [ ] **`next.config.ts`**: standalone output for Docker builds
+- [x] **`Dockerfile`**: multi-stage build for Next.js standalone
+- [x] **`docker-compose.yml`**: API + PostgreSQL, migration on start
+- [x] **`.env.example`**: all config vars documented
+- [x] **`README.md`**: quick start, API docs, self-host, deploy to Vercel
+- [x] **`next.config.ts`**: standalone output for Docker builds
 - [ ] Post on Hacker News, Indie Hackers, r/SaaS (user does this)
 
 ## What Each Phase Unblocked Looks Like
