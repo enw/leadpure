@@ -25,10 +25,7 @@ export async function validateApiKey(key: string | null): Promise<ApiKey | null>
 
   if (!db) return null;
 
-  const rows = await db(
-    'SELECT id, tier, usage_count, monthly_limit, active FROM api_keys WHERE key_hash = $1',
-    [hashKey(key)],
-  );
+  const rows = await db`SELECT id, tier, usage_count, monthly_limit, active FROM api_keys WHERE key_hash = ${hashKey(key)}`;
   const row = rows[0] as Record<string, unknown> | undefined;
   if (!row) return null;
 
