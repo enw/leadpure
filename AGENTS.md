@@ -16,6 +16,7 @@ Open-source email enrichment API. TypeScript (Bun/Next.js), cache-first PostgreS
 
 ## Workflow
 
+- **Current phase**: Phase 2 (Scraping Engine) on `phase-2-scraping-engine` branch
 - Trunk-based: `main` branch. Feature branches per phase.
 - Each phase: spec → branch → implement → PR → user validates → merge
 - PRs via `gh` CLI
