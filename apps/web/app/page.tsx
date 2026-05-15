@@ -57,6 +57,27 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="how-section">
+        <h2>How it works</h2>
+        <div className="how-grid">
+          <div className="how-card">
+            <div className="how-step">1</div>
+            <h3>Get an API key</h3>
+            <p>Enter your email and get a key instantly. Free tier: 50 enrichments per month.</p>
+          </div>
+          <div className="how-card">
+            <div className="how-step">2</div>
+            <h3>Send an email</h3>
+            <p>POST to <code>/v1/enrich</code> with the email or domain you want to look up.</p>
+          </div>
+          <div className="how-card">
+            <div className="how-step">3</div>
+            <h3>Get structured data</h3>
+            <p>Name, company, industry, location, social profiles — with a confidence score for each result.</p>
+          </div>
+        </div>
+      </section>
+
       <footer className="footer">
         <a href="https://github.com/enw/leadpure" target="_blank" rel="noopener noreferrer">GitHub</a>
         <span className="sep">·</span>
