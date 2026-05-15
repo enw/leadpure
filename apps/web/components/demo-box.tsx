@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 
+// Dev API key — public in the open-source repo, no real secrets
+const DEMO_KEY = 'lp_live_testkey123';
+
 export default function DemoBox() {
   const [email, setEmail] = useState('');
   const [result, setResult] = useState<unknown>(null);
@@ -17,7 +20,10 @@ export default function DemoBox() {
     try {
       const res = await fetch('/api/v1/enrich', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': DEMO_KEY,
+        },
         body: JSON.stringify({ email }),
       });
       if (!res.ok) {
