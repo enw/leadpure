@@ -37,10 +37,7 @@ export async function POST(req: NextRequest) {
   const rawKey = generateApiKey();
   const keyHash = createHash('sha256').update(rawKey).digest('hex');
 
-  await db(
-    'INSERT INTO api_keys (key_hash, name, tier, monthly_limit) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING',
-    [keyHash, email, 'free', 50],
-  );
+  await db`INSERT INTO api_keys (key_hash, name, tier, monthly_limit) VALUES (${keyHash}, ${email}, ${'free'}, ${50}) ON CONFLICT DO NOTHING`;
 
   return NextResponse.json({ api_key: rawKey, tier: 'free', monthly_limit: 50 });
 }

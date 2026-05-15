@@ -14,16 +14,13 @@ export async function getCachedEnrichment(email?: string, domain?: string) {
   const inputHash = hashInput(input);
   const inputType = email ? 'email' : 'domain';
 
-  const rows = await db(
-    `SELECT result, confidence, source_meta, created_at
+  const rows = await db`SELECT result, confidence, source_meta, created_at
      FROM enrichments
-     WHERE input_hash = $1
-       AND input_type = $2
+     WHERE input_hash = ${inputHash}
+       AND input_type = ${inputType}
        AND expires_at > now()
      ORDER BY created_at DESC
-     LIMIT 1`,
-    [inputHash, inputType],
-  );
+     LIMIT 1`;
 
   if (rows.length === 0) return null;
   const row = rows[0] as Record<string, unknown>;
@@ -47,40 +44,19 @@ export async function writeEnrichment(
   const inputType = email ? 'email' : 'domain';
 
   // Upsert: update if same input_hash exists, otherwise insert
-  const existing = await db(
-    'SELECT id FROM enrichments WHERE input_hash = $1 AND input_type = $2',
-    [inputHash, inputType],
-  );
+  const existing = await db`SELECT id FROM enrichments WHERE input_hash = ${inputHash} AND input_type = ${inputType}`;
 
   if (existing.length > 0) {
-    await db(
-      `UPDATE enrichments
-       SET result = $1::jsonb,
-           confidence = $2,
-           source_meta = $3::jsonb,
+    await db`UPDATE enrichments
+       SET result = ${JSON.stringify(result)}::jsonb,
+           confidence = ${confidence},
+           source_meta = ${JSON.stringify({ sources: ['github', 'website', 'crunchbase'] })}::jsonb,
            created_at = now(),
            expires_at = now() + interval '30 days'
-       WHERE input_hash = $4 AND input_type = $5`,
-      [
-        JSON.stringify(result),
-        confidence,
-        JSON.stringify({ sources: ['github', 'website', 'crunchbase'] }),
-        inputHash,
-        inputType,
-      ],
-    );
+       WHERE input_hash = ${inputHash} AND input_type = ${inputType}`;
   } else {
-    await db(
-      `INSERT INTO enrichments (input_hash, input_type, result, confidence, source_meta)
-       VALUES ($1, $2, $3::jsonb, $4, $5::jsonb)`,
-      [
-        inputHash,
-        inputType,
-        JSON.stringify(result),
-        confidence,
-        JSON.stringify({ sources: ['github', 'website', 'crunchbase'] }),
-      ],
-    );
+    await db`INSERT INTO enrichments (input_hash, input_type, result, confidence, source_meta)
+       VALUES (${inputHash}, ${inputType}, ${JSON.stringify(result)}::jsonb, ${confidence}, ${JSON.stringify({ sources: ['github', 'website', 'crunchbase'] })}::jsonb)`;
   }
 }
 
@@ -91,8 +67,5 @@ export async function logUsage(
   cacheHit: boolean,
 ) {
   if (!db) return;
-  await db(
-    'INSERT INTO usage_log (api_key_id, endpoint, input_hash, cache_hit) VALUES ($1, $2, $3, $4)',
-    [apiKeyId, endpoint, inputHash, cacheHit],
-  );
+  await db`INSERT INTO usage_log (api_key_id, endpoint, input_hash, cache_hit) VALUES (${apiKeyId}, ${endpoint}, ${inputHash}, ${cacheHit})`;
 }
