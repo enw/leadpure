@@ -6,7 +6,6 @@
 # All tests must pass for CI.
 
 set -euo pipefail
-shopt -s inherit_errexit
 
 PORT="${PORT:-3000}"
 API_KEY="${API_KEY:-lp_live_testkey123}"
@@ -26,51 +25,71 @@ trap cleanup EXIT
 
 # ── Helpers ────────────────────────────────────────────────────────
 
-assert_status() {
-  local label="$1" method="$2" path="$3" expected="$4" extra_args="${5:-}"
-  local actual
-  actual=$(curl -s -o /dev/null -w "%{http_code}" -X "$method" \
-    "$BASE$path" $extra_args 2>/dev/null || echo "000")
-  if [ "$actual" = "$expected" ]; then
-    echo "  ✓ $label"
-    ((PASS++))
-  else
-    echo "  ✗ $label (expected $expected, got $actual)"
-    ((FAIL++))
-  fi
+# Performs a POST with JSON body + api key header
+enrich() {
+  local data="$1"
+  curl -s -X POST "$BASE/api/v1/enrich" \
+    -H 'Content-Type: application/json' \
+    -H "x-api-key: $API_KEY" \
+    -d "$data" 2>/dev/null || echo ""
 }
 
-assert_json() {
-  local label="$1" method="$2" path="$3" jq_filter="$4" extra_args="${5:-}"
-  local body
-  body=$(curl -s -X "$method" "$BASE$path" $extra_args 2>/dev/null || echo "")
-  if echo "$body" | jq -e "$jq_filter" >/dev/null 2>&1; then
-    echo "  ✓ $label"
-    ((PASS++))
-  else
-    echo "  ✗ $label (jq filter '$jq_filter' failed)"
-    echo "    body: $body"
-    ((FAIL++))
-  fi
+# Performs a POST with JSON body, NO api key (for auth tests)
+enrich_noauth() {
+  local data="$1"
+  curl -s -X POST "$BASE/api/v1/enrich" \
+    -H 'Content-Type: application/json' \
+    -d "$data" 2>/dev/null || echo ""
+}
+
+# Performs a POST with JSON body + bad api key
+enrich_badauth() {
+  local data="$1"
+  curl -s -X POST "$BASE/api/v1/enrich" \
+    -H 'Content-Type: application/json' \
+    -H 'x-api-key: badkey' \
+    -d "$data" 2>/dev/null || echo ""
+}
+
+# Get only HTTP status code
+status_of() {
+  local method="$1" path="$2"
+  curl -s -o /dev/null -w "%{http_code}" -X "$method" "$BASE$path" 2>/dev/null || echo "000"
+}
+
+# Get landing page
+landing() {
+  curl -s "$BASE/" 2>/dev/null || echo ""
+}
+
+# ── Assertions ─────────────────────────────────────────────────────
+
+pass() {
+  echo "  ✓ $1"
+  ((PASS++))
+}
+
+fail() {
+  echo "  ✗ $1"
+  ((FAIL++))
 }
 
 # ── Start server if not already running ────────────────────────────
 
-if ! curl -sf -o /dev/null "$BASE/" 2>/dev/null; then
+if [ "$(status_of GET "/" 2>/dev/null)" = "000" ]; then
   echo "==> Starting dev server..."
   cd "$ROOT"
   NODE_ENV=development bun run dev &
   SERVER_PID=$!
-  # Wait up to 20s for server to be ready
-  for i in $(seq 1 20); do
-    if curl -sf -o /dev/null "$BASE/" 2>/dev/null; then
+  for i in $(seq 1 30); do
+    if [ "$(status_of GET "/")" != "000" ]; then
       echo "    Server ready after ${i}s"
       break
     fi
     sleep 1
   done
-  if ! curl -sf -o /dev/null "$BASE/" 2>/dev/null; then
-    echo "FAIL: Server didn't start within 20s"
+  if [ "$(status_of GET "/")" = "000" ]; then
+    echo "FAIL: Server didn't start within 30s"
     exit 1
   fi
 else
@@ -81,77 +100,87 @@ echo ""
 echo "==> Running API smoke tests"
 echo ""
 
-# ── 1. Enrich with valid API key ────────────────────────────────────
+# ── 1. Enrich with valid API key ──────────────────────────────────
 
 echo "  1. Enrich endpoint - happy path"
 
-assert_status "Valid email returns 200" \
-  POST "/api/v1/enrich" "200" \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{\"email\":\"test@example.com\"}'"
+body="$(enrich '{"email":"test@example.com"}')"
+code="$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/enrich" \
+  -H 'Content-Type: application/json' -H "x-api-key: $API_KEY" \
+  -d '{"email":"test@example.com"}' 2>/dev/null)"
 
-assert_json "Email in response matches request" \
-  POST "/api/v1/enrich" '.email == "test@example.com"' \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{\"email\":\"test@example.com\"}'"
+[ "$code" = "200" ] && pass "Valid email returns 200" || fail "Valid email should return 200, got $code"
 
-assert_json "Domain extracted from email" \
-  POST "/api/v1/enrich" '.domain == "example.com"' \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{\"email\":\"test@example.com\"}'"
+echo "$body" | jq -e '.email == "test@example.com"' >/dev/null 2>&1 \
+  && pass "Email in response matches request" \
+  || fail "Email mismatch: $(echo "$body" | jq .email)"
 
-assert_json "Confidence is 0.3 to 1.0 float" \
-  POST "/api/v1/enrich" '.confidence >= 0.3 and .confidence <= 1.0' \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{\"email\":\"test@example.com\"}'"
+echo "$body" | jq -e '.domain == "example.com"' >/dev/null 2>&1 \
+  && pass "Domain extracted from email" \
+  || fail "Domain wrong: $(echo "$body" | jq .domain)"
 
-assert_json "Not cached" \
-  POST "/api/v1/enrich" '.cached == false' \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{\"email\":\"test@example.com\"}'"
+echo "$body" | jq -e '.confidence >= 0.3 and .confidence <= 1.0' >/dev/null 2>&1 \
+  && pass "Confidence is 0.3 to 1.0" \
+  || fail "Confidence out of range: $(echo "$body" | jq .confidence)"
 
-# ── 2. Enrich by domain only ────────────────────────────────────────
+echo "$body" | jq -e '.cached == false' >/dev/null 2>&1 \
+  && pass "Not cached" \
+  || fail "Expected cached=false"
+
+# ── 2. Enrich by domain only ──────────────────────────────────────
 
 echo ""
 echo "  2. Enrich by domain"
 
-assert_status "Domain-only returns 200" \
-  POST "/api/v1/enrich" "200" \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{\"domain\":\"vercel.com\"}'"
+body="$(enrich '{"domain":"vercel.com"}')"
+code="$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/enrich" \
+  -H 'Content-Type: application/json' -H "x-api-key: $API_KEY" \
+  -d '{"domain":"vercel.com"}' 2>/dev/null)"
 
-assert_json "Domain preserved" \
-  POST "/api/v1/enrich" '.domain == "vercel.com"' \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{\"domain\":\"vercel.com\"}'"
+[ "$code" = "200" ] && pass "Domain-only returns 200" || fail "Domain-only got $code"
+echo "$body" | jq -e '.domain == "vercel.com"' >/dev/null 2>&1 \
+  && pass "Domain preserved" \
+  || fail "Domain wrong: $(echo "$body" | jq .domain)"
 
-# ── 3. Auth failures ────────────────────────────────────────────────
+# ── 3. Auth failures ──────────────────────────────────────────────
 
 echo ""
 echo "  3. Auth & validation"
 
-assert_status "No API key → 401" \
-  POST "/api/v1/enrich" "401" \
-  "-H 'Content-Type: application/json' -d '{\"email\":\"test@example.com\"}'"
+code="$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/enrich" \
+  -H 'Content-Type: application/json' -d '{"email":"test@example.com"}' 2>/dev/null)"
+[ "$code" = "401" ] && pass "No API key → 401" || fail "No API key: expected 401, got $code"
 
-assert_status "Bad API key → 401" \
-  POST "/api/v1/enrich" "401" \
-  "-H 'Content-Type: application/json' -H 'x-api-key: badkey' -d '{\"email\":\"test@example.com\"}'"
+code="$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/enrich" \
+  -H 'Content-Type: application/json' -H 'x-api-key: badkey' -d '{"email":"test@example.com"}' 2>/dev/null)"
+[ "$code" = "401" ] && pass "Bad API key → 401" || fail "Bad API key: expected 401, got $code"
 
-assert_status "No body → 400" \
-  POST "/api/v1/enrich" "400" \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{}'"
+code="$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/enrich" \
+  -H 'Content-Type: application/json' -H "x-api-key: $API_KEY" -d '{}' 2>/dev/null)"
+[ "$code" = "400" ] && pass "No body → 400" || fail "No body: expected 400, got $code"
 
-assert_status "Invalid email → 400" \
-  POST "/api/v1/enrich" "400" \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d '{\"email\":\"notanemail\"}'"
+code="$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/enrich" \
+  -H 'Content-Type: application/json' -H "x-api-key: $API_KEY" -d '{"email":"notanemail"}' 2>/dev/null)"
+[ "$code" = "400" ] && pass "Invalid email → 400" || fail "Invalid email: expected 400, got $code"
 
-assert_status "Bad JSON → 400" \
-  POST "/api/v1/enrich" "400" \
-  "-H 'Content-Type: application/json' -H 'x-api-key: $API_KEY' -d 'not-json'"
+code="$(curl -s -o /dev/null -w '%{http_code}' -X POST "$BASE/api/v1/enrich" \
+  -H 'Content-Type: application/json' -H "x-api-key: $API_KEY" -d 'not-json' 2>/dev/null)"
+[ "$code" = "400" ] && pass "Bad JSON → 400" || fail "Bad JSON: expected 400, got $code"
 
-# ── 4. Landing page ─────────────────────────────────────────────────
+# ── 4. Landing page ───────────────────────────────────────────────
 
 echo ""
 echo "  4. Landing page"
 
-assert_status "Landing page renders" GET "/" 200
-assert_json "Title contains LeadPure" GET "/" '.title | test("LeadPure")'
+code="$(status_of GET "/")"
+[ "$code" = "200" ] && pass "Landing page renders (200)" || fail "Landing page: got $code"
 
-# ── Summary ─────────────────────────────────────────────────────────
+body="$(landing)"
+echo "$body" | grep -qi "leadpure" \
+  && pass "Page contains LeadPure" \
+  || fail "Page doesn't mention LeadPure"
+
+# ── Summary ───────────────────────────────────────────────────────
 
 echo ""
 echo "========================================"

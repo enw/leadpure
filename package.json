@@ -7,7 +7,7 @@
     "build": "bun run --filter @leadpure/web build",
     "lint": "bun run --filter @leadpure/* lint",
     "test": "bun test",
-    "test:smoke": "bash test/api/smoke.sh"
+    "test:smoke": "bun test test/api/smoke.test.ts"
   },
   "devDependencies": {
     "bun-types": "^1.3.14",
