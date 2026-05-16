@@ -63,9 +63,9 @@ export default function DemoBox() {
       </div>
 
       {error && <div className="demo-error">{String(error)}</div>}
-      {result && (
+      {result !== null ? (
         <pre className="demo-result">{JSON.stringify(result, null, 2)}</pre>
-      )}
+      ) : null}
     </section>
   );
 }
