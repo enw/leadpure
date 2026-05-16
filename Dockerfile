@@ -20,7 +20,7 @@ COPY apps/worker/ apps/worker/
 COPY scripts/ scripts/
 
 # Build Next.js standalone
-RUN cd apps/web && NODE_ENV=production bun run build
+RUN cd apps/web && DOCKER_BUILD=true NODE_ENV=production bun run build
 
 # Stage 2: Runtime
 FROM oven/bun:1 AS runner
@@ -33,8 +33,12 @@ ENV SELF_HOST=true
 # Copy standalone build
 COPY --from=builder /app/apps/web/.next/standalone ./
 COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages ./packages
 COPY scripts/ ./scripts/
+
+# Ensure postgres.js is available for the migrate script
+RUN bun add postgres@3.4.5
 
 EXPOSE 3000
 

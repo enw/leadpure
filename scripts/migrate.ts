@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import postgres from 'postgres';
 import { createHash } from 'crypto';
 
 const url = process.env.DATABASE_URL;
@@ -7,11 +8,14 @@ if (!url) {
   process.exit(0);
 }
 
-const sql = neon(url);
+const isSelfHost = process.env.SELF_HOST === 'true';
+const sql: ReturnType<typeof neon> | ReturnType<typeof postgres> = isSelfHost
+  ? postgres(url)
+  : neon(url);
 
 // Create api_keys table
-await sql(
-  `CREATE TABLE IF NOT EXISTS api_keys (
+await sql`
+  CREATE TABLE IF NOT EXISTS api_keys (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key_hash      TEXT NOT NULL UNIQUE,
     name          TEXT NOT NULL DEFAULT '',
@@ -20,12 +24,12 @@ await sql(
     monthly_limit INTEGER NOT NULL DEFAULT 50,
     active        BOOLEAN NOT NULL DEFAULT true,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
-  )`,
-);
+  )
+`;
 
 // Create enrichments table
-await sql(
-  `CREATE TABLE IF NOT EXISTS enrichments (
+await sql`
+  CREATE TABLE IF NOT EXISTS enrichments (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     input_hash    TEXT NOT NULL,
     input_type    TEXT NOT NULL,
@@ -34,34 +38,34 @@ await sql(
     source_meta   JSONB NOT NULL DEFAULT '{}',
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     expires_at    TIMESTAMPTZ NOT NULL DEFAULT now() + interval '30 days'
-  )`,
-);
+  )
+`;
 
 // Create indexes on enrichments
-await sql(
-  'CREATE INDEX IF NOT EXISTS idx_enrichments_input_hash ON enrichments(input_hash)',
-);
-await sql(
-  'CREATE INDEX IF NOT EXISTS idx_enrichments_expires_at ON enrichments(expires_at)',
-);
+await sql`CREATE INDEX IF NOT EXISTS idx_enrichments_input_hash ON enrichments(input_hash)`;
+await sql`CREATE INDEX IF NOT EXISTS idx_enrichments_expires_at ON enrichments(expires_at)`;
 
 // Create usage_log table
-await sql(
-  `CREATE TABLE IF NOT EXISTS usage_log (
+await sql`
+  CREATE TABLE IF NOT EXISTS usage_log (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     api_key_id  UUID REFERENCES api_keys(id),
     endpoint    TEXT NOT NULL,
     input_hash  TEXT,
     cache_hit   BOOLEAN NOT NULL DEFAULT false,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-  )`,
-);
+  )
+`;
 
 // Seed dev key
 const devKeyHash = createHash('sha256').update('lp_live_testkey123').digest('hex');
-await sql(
-  'INSERT INTO api_keys (key_hash, name, tier, monthly_limit) VALUES ($1, $2, $3, $4) ON CONFLICT (key_hash) DO NOTHING',
-  [devKeyHash, 'dev key', 'free', 50],
-);
+await sql`
+  INSERT INTO api_keys (key_hash, name, tier, monthly_limit) 
+  VALUES (${devKeyHash}, 'dev key', 'free', 50) 
+  ON CONFLICT (key_hash) DO NOTHING
+`;
 
 console.log('Migration complete.');
+if (typeof (sql as { end?: () => Promise<void> }).end === 'function') {
+  await (sql as { end: () => Promise<void> }).end();
+}
