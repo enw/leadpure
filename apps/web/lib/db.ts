@@ -1,8 +1,19 @@
 import { neon } from '@neondatabase/serverless';
+import postgres from 'postgres';
 import { createHash } from 'crypto';
 
-const url = process.env.DATABASE_URL;
-export const db = url ? neon(url) : null;
+const url = process.env.DATABASE_URL || '';
+const isSelfHost = process.env.SELF_HOST === 'true';
+
+function createDb() {
+  if (!url) return null;
+  if (isSelfHost) {
+    return postgres(url);
+  }
+  return neon(url);
+}
+
+export const db = createDb();
 
 export function hashInput(input: string): string {
   return createHash('sha256').update(input.toLowerCase().trim()).digest('hex');
@@ -43,7 +54,6 @@ export async function writeEnrichment(
   const inputHash = hashInput(input);
   const inputType = email ? 'email' : 'domain';
 
-  // Upsert: update if same input_hash exists, otherwise insert
   const existing = await db`SELECT id FROM enrichments WHERE input_hash = ${inputHash} AND input_type = ${inputType}`;
 
   if (existing.length > 0) {
