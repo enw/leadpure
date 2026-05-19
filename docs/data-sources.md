@@ -2,6 +2,8 @@
 
 Each source is scraped in parallel. The aggregator merges results and computes a confidence score.
 
+Legal and compliance notes: [data-sources-legal.md](./data-sources-legal.md).
+
 ## MVP Sources
 
 ### 1. Crunchbase
@@ -15,7 +17,20 @@ Each source is scraped in parallel. The aggregator merges results and computes a
 | Founded date | Company page | Low |
 | Founders | Company page → People tab | Low-Moderate |
 
-**Approach**: Use Crunchbase's public search API. If the domain is `acme.com`, search for "acme" and match by domain in results.
+**Approach**: Licensed Crunchbase Data API only (not implemented). Mock/scrape removed — see `docs/data-sources-legal.md`.
+
+### 1b. Website (enhanced parse) — **live**
+
+| Field | Method | Risk |
+|---|---|---|
+| Company name | JSON-LD `Organization`, `og:site_name`, `<title>` | Very Low |
+| Description | JSON-LD, meta description, OG | Very Low |
+| Industry | JSON-LD `industry` / keywords | Low |
+| Location | JSON-LD `PostalAddress` | Low |
+| Employee count | JSON-LD `numberOfEmployees` (when present) | Low |
+| Social | `<a href>`, JSON-LD `sameAs` | Very Low |
+
+**Approach**: HTTP GET homepage + optional `/about`, `/about-us`, `/company`, `/team` when `robots.txt` allows. cheerio + JSON-LD parser. See `apps/worker/src/scrapers/website.ts`.
 
 ### 2. GitHub
 

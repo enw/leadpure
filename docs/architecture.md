@@ -156,7 +156,7 @@ leadpure/
 │           ├── index.ts      # Job system (createJob/runJob/getJob)
 │           ├── aggregator.ts # Merge + confidence
 │           └── scrapers/
-│               ├── crunchbase.ts  # Mock (MVP)
+│               ├── crunchbase.ts  # Disabled until licensed API
 │               ├── github.ts      # GitHub REST API
 │               └── website.ts     # cheerio parser
 ├── packages/

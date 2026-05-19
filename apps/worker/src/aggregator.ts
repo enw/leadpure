@@ -11,22 +11,48 @@ export interface AggregateSources {
   website: WebsiteData | null;
 }
 
+function isRealCrunchbase(data: CrunchbaseData | null): data is CrunchbaseData {
+  return data !== null;
+}
+
+function websiteContributes(data: WebsiteData | null): boolean {
+  if (!data) return false;
+  return Boolean(
+    data.company_name ||
+      data.description ||
+      data.industry ||
+      data.location ||
+      data.fields_from.includes('jsonld'),
+  );
+}
+
 function extractCompany(source: AggregateSources): string | null {
-  return source.github?.company ?? source.crunchbase?.name ?? null;
+  if (source.github?.company) return source.github.company;
+  if (source.website?.company_name) return source.website.company_name;
+  if (isRealCrunchbase(source.crunchbase)) return source.crunchbase.name;
+  return null;
 }
 
 function extractName(source: AggregateSources): string | null {
-  return source.github?.name ?? source.crunchbase?.name ?? null;
+  return source.github?.name ?? null;
 }
 
 function extractIndustry(source: AggregateSources): string | null {
-  if (source.crunchbase?.industry) return source.crunchbase.industry;
+  if (source.website?.industry) return source.website.industry;
   if (source.website?.keywords?.length) return source.website.keywords[0];
+  if (isRealCrunchbase(source.crunchbase)) return source.crunchbase.industry;
   return null;
 }
 
 function extractLocation(source: AggregateSources): string | null {
-  return source.github?.location ?? source.crunchbase?.location ?? null;
+  if (source.github?.location) return source.github.location;
+  if (source.website?.location) return source.website.location;
+  if (isRealCrunchbase(source.crunchbase)) return source.crunchbase.location;
+  return null;
+}
+
+function extractCompanySize(source: AggregateSources): string | null {
+  return source.website?.company_size ?? null;
 }
 
 function extractSocial(source: AggregateSources): EnrichResult['social'] {
@@ -53,15 +79,15 @@ function extractSocial(source: AggregateSources): EnrichResult['social'] {
 
 function calculateConfidence(source: AggregateSources): number {
   let sources = 0;
-  if (source.crunchbase && !('_isMock' in source.crunchbase)) sources++;
+  if (isRealCrunchbase(source.crunchbase)) sources++;
   if (source.github) sources++;
-  if (source.website) sources++;
+  if (websiteContributes(source.website)) sources++;
   return Math.min(0.3 + sources * 0.25, 1.0);
 }
 
 /**
  * Aggregate data from all scraping sources into a single EnrichResult.
- * Priority order: GitHub > Crunchbase > Website scraped metadata.
+ * Priority: GitHub (person) > website structured data > Crunchbase (when licensed).
  */
 export function aggregate(sources: AggregateSources): EnrichResult {
   return {
@@ -69,8 +95,8 @@ export function aggregate(sources: AggregateSources): EnrichResult {
     domain: sources.domain,
     name: extractName(sources),
     title: null,
-    company: extractCompany(sources) ?? null,
-    company_size: null,
+    company: extractCompany(sources),
+    company_size: extractCompanySize(sources),
     industry: extractIndustry(sources),
     location: extractLocation(sources),
     social: extractSocial(sources),

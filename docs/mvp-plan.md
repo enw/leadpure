@@ -8,7 +8,7 @@ Build the minimum viable LeadPure: a working enrichment API + landing page that 
 
 - [x] Single enrichment endpoint (`POST /api/v1/enrich` with `{email}` or `{domain}`)
 - [x] Cache-first PostgreSQL backend (30-day TTL) — Neon `leadpure-prod`, `DATABASE_URL` on Vercel
-- [x] At least 3 data sources live (Crunchbase mock, GitHub, website parse)
+- [x] At least 2 data sources live (GitHub, website parse); Crunchbase disabled until licensed API
 - [x] API key auth (generate key on signup via `POST /api/v1/keys`)
 - [x] Landing page with value prop + interactive demo
 - [x] Deployed and reachable at a public URL — https://leadpure.e10d.dev
@@ -47,7 +47,8 @@ Code-complete for MVP; these are launch / ops checks:
 
 - [x] **GitHub scraper**: search user by email/name, extract profile, repos, tech languages
 - [x] **Website parser**: fetch URL, extract `<title>`, meta description, social links
-- [x] **Crunchbase scraper**: mock data (real scrape blocked by anti-bot)
+- [x] **Website parse (enhanced)**: JSON-LD Organization, Open Graph, robots-aware `/about` paths
+- [x] **Crunchbase**: removed mock (returns null until licensed API)
 - [x] **Aggregator**: merge results, dedupe, compute confidence score
 - [x] **Worker**: wire up in-process queue, process enrichments asynchronously
 - [x] Tests: unit tests (15) + API smoke tests (16)

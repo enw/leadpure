@@ -10,8 +10,9 @@ export interface GithubData {
   avatar_url: string | null;
 }
 
+import { scraperUserAgent } from './http';
+
 const GITHUB_API = 'https://api.github.com';
-const USER_AGENT = 'LeadPure/1.0 (enrichment-bot)';
 
 interface GitHubUser {
   login: string;
@@ -32,7 +33,7 @@ async function fetchJson<T>(url: string): Promise<T | null> {
   const res = await fetch(url, {
     headers: {
       Accept: 'application/vnd.github.v3+json',
-      'User-Agent': USER_AGENT,
+      'User-Agent': scraperUserAgent(),
     },
   });
   if (!res.ok) return null;

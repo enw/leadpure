@@ -60,13 +60,13 @@ export async function writeEnrichment(
     await db`UPDATE enrichments
        SET result = ${JSON.stringify(result)}::jsonb,
            confidence = ${confidence},
-           source_meta = ${JSON.stringify({ sources: ['github', 'website', 'crunchbase'] })}::jsonb,
+           source_meta = ${JSON.stringify({ sources: ['github', 'website'] })}::jsonb,
            created_at = now(),
            expires_at = now() + interval '30 days'
        WHERE input_hash = ${inputHash} AND input_type = ${inputType}`;
   } else {
     await db`INSERT INTO enrichments (input_hash, input_type, result, confidence, source_meta)
-       VALUES (${inputHash}, ${inputType}, ${JSON.stringify(result)}::jsonb, ${confidence}, ${JSON.stringify({ sources: ['github', 'website', 'crunchbase'] })}::jsonb)`;
+       VALUES (${inputHash}, ${inputType}, ${JSON.stringify(result)}::jsonb, ${confidence}, ${JSON.stringify({ sources: ['github', 'website'] })}::jsonb)`;
   }
 }
 
