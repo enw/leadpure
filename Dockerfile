@@ -36,6 +36,7 @@ COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages ./packages
 COPY scripts/ ./scripts/
+RUN chmod +x scripts/docker-entrypoint.sh
 
 # Ensure postgres.js is available for the migrate script
 RUN bun add postgres@3.4.5

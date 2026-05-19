@@ -27,8 +27,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: >
-      sh -c "bun run scripts/migrate.ts && bun run apps/web/server.js"
+    command: ["sh", "scripts/docker-entrypoint.sh"]
 
 volumes:
   pgdata:
