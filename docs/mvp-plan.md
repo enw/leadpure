@@ -82,7 +82,7 @@ Build the minimum viable LeadPure: a working enrichment API + landing page that 
 
 ## What Each Phase Unblocked Looks Like
 
-**End of Phase 1**: `curl -X POST https://leadpure.dev/v1/enrich -d '{"email":"test@example.com"}'` returns mock data. Landing page exists.
+**End of Phase 1**: `curl -X POST https://leadpure.e10d.dev/v1/enrich -d '{"email":"test@example.com"}'` returns mock data. Landing page exists.
 
 **End of Phase 2**: `POST /v1/enrich` with a real email returns real data from Crunchbase + GitHub + website. ~2-5s on cold start.
 
@@ -90,7 +90,7 @@ Build the minimum viable LeadPure: a working enrichment API + landing page that 
 
 **End of Phase 4**: Landing page has working interactive demo. Users can sign up and get an API key.
 
-**End of Phase 5**: Live at leadpure.dev. Self-hostable. Posted on HN/Reddit.
+**End of Phase 5**: Live at leadpure.e10d.dev. Self-hostable. Posted on HN/Reddit.
 
 ## Verification Gates
 

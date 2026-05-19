@@ -2,7 +2,7 @@
 
 Build the project skeleton: workspace, database, single endpoint, landing page.
 
-At the end of this phase, `curl -X POST https://leadpure.dev/v1/enrich -d '{"email":"test@example.com"}'` returns mock data and the landing page is reachable.
+At the end of this phase, `curl -X POST https://leadpure.e10d.dev/v1/enrich -d '{"email":"test@example.com"}'` returns mock data and the landing page is reachable.
 
 ---
 

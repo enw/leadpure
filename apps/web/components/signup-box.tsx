@@ -51,7 +51,7 @@ export default function SignupBox() {
         </div>
         <div className="key-examples">
           <p>Try it out:</p>
-          <pre className="demo-result">{`curl -X POST https://leadpure.dev/v1/enrich \\\n  -H 'x-api-key: ${apiKey}' \\\n  -H 'Content-Type: application/json' \\\n  -d '{"email":"john@acme.com"}'`}</pre>
+          <pre className="demo-result">{`curl -X POST https://leadpure.e10d.dev/v1/enrich \\\n  -H 'x-api-key: ${apiKey}' \\\n  -H 'Content-Type: application/json' \\\n  -d '{"email":"john@acme.com"}'`}</pre>
         </div>
       </section>
     );

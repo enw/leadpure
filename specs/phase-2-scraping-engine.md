@@ -283,7 +283,7 @@ export async function scrapeWebsite(domain: string): Promise<WebsiteData | null>
   for (const url of urls) {
     try {
       const res = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LeadPure/0.1; +https://leadpure.dev)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LeadPure/0.1; +https://leadpure.e10d.dev)' },
         signal: AbortSignal.timeout(5000),
       });
       if (res.ok) {

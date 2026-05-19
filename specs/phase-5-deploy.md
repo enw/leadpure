@@ -116,7 +116,7 @@ SELF_HOST=false
 
 # Deployment
 # Set to your Vercel deployment URL in production
-# LEADPURE_URL=https://leadpure.dev
+# LEADPURE_URL=https://leadpure.e10d.dev
 ```
 
 ### 4. `README.md`

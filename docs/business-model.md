@@ -25,7 +25,7 @@
 | Vercel (Hobby) | $0 | Paused after inactivity, cold starts acceptable |
 | Neon PostgreSQL | $0 | Free tier: 0.5GB, 3 projects |
 | fly.io (worker) | ~$5-10 | Single shared-cpu-1x instance |
-| Domain | ~$1/mo | leadpure.dev ($12/yr) |
+| Domain | ~$1/mo | leadpure.e10d.dev ($12/yr) |
 | Proxies (Smartproxy) | ~$25-30 | Residential pool, 5GB/mo |
 | **Total fixed** | **~$31-41/mo** | |
 

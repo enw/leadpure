@@ -21,7 +21,7 @@ bun run dev
 ### Get an API key
 
 ```bash
-curl -X POST https://leadpure.dev/api/v1/keys \
+curl -X POST https://leadpure.e10d.dev/api/v1/keys \
   -H 'Content-Type: application/json' \
   -d '{"email":"you@example.com"}'
 ```
@@ -34,7 +34,7 @@ Response:
 ### Enrich an email
 
 ```bash
-curl -X POST https://leadpure.dev/api/v1/enrich \
+curl -X POST https://leadpure.e10d.dev/api/v1/enrich \
   -H 'x-api-key: lp_live_xxx' \
   -H 'Content-Type: application/json' \
   -d '{"email":"john@acme.com"}'
@@ -45,7 +45,7 @@ Response includes: name, company, industry, location, social profiles, confidenc
 ### Poll a job
 
 ```bash
-curl https://leadpure.dev/api/v1/jobs/job_1234567890_1
+curl https://leadpure.e10d.dev/api/v1/jobs/job_1234567890_1
 ```
 
 ### Rate limits
