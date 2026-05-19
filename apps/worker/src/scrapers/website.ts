@@ -134,7 +134,7 @@ function parseHtml(html: string, pageKind: WebsiteFieldSource): ParsedPage {
 
   parsed.company_name =
     (ogSiteName && !GENERIC_PAGE_TITLES.has(ogSiteName.toLowerCase()) ? ogSiteName : null) ||
-    titleAsCompanyName(ogTitle) ||
+    titleAsCompanyName(ogTitle ?? null) ||
     titleAsCompanyName(titleRaw) ||
     null;
 
