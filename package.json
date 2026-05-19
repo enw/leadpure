@@ -1,5 +1,6 @@
 {
   "name": "leadpure",
+  "license": "MIT",
   "private": true,
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
