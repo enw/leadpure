@@ -1,12 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function SignupBox() {
   const [email, setEmail] = useState('');
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [baseUrl, setBaseUrl] = useState('');
+
+  useEffect(() => {
+    setBaseUrl(window.location.origin);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,7 +56,7 @@ export default function SignupBox() {
         </div>
         <div className="key-examples">
           <p>Try it out:</p>
-          <pre className="demo-result">{`curl -X POST https://leadpure.e10d.dev/v1/enrich \\\n  -H 'x-api-key: ${apiKey}' \\\n  -H 'Content-Type: application/json' \\\n  -d '{"email":"john@acme.com"}'`}</pre>
+          <pre className="demo-result">{`curl -X POST ${baseUrl || 'https://your-host'}/api/v1/enrich \\\n  -H 'x-api-key: ${apiKey}' \\\n  -H 'Content-Type: application/json' \\\n  -d '{"email":"john@acme.com"}'`}</pre>
         </div>
       </section>
     );

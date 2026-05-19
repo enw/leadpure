@@ -1,22 +1,28 @@
 import type { Metadata } from 'next';
+import { getPublicBaseUrl } from '@/lib/public-url';
 
 export const metadata: Metadata = {
   title: 'API Docs — LeadPure',
 };
 
 export default function DocsPage() {
+  const base = getPublicBaseUrl();
+
   return (
     <main className="docs-page">
       <h1>API Reference</h1>
 
       <h2>Authentication</h2>
-      <p>Send your API key in the <code>x-api-key</code> header:</p>
-      <pre className="demo-result">{`curl -X POST https://leadpure.e10d.dev/v1/enrich \\\n  -H 'x-api-key: lp_live_xxx' \\\n  -H 'Content-Type: application/json' \\\n  -d '{"email":"john@acme.com"}'`}</pre>
+      <p>Send your API key in the <code>x-api-key</code> header on every request.</p>
 
       <h2>Endpoints</h2>
 
       <h3>POST /api/v1/enrich</h3>
       <p>Enrich an email or domain with company data.</p>
+      <pre className="demo-result">{`curl -X POST ${base}/api/v1/enrich \\
+  -H 'x-api-key: lp_live_xxx' \\
+  -H 'Content-Type: application/json' \\
+  -d '{"email":"john@acme.com"}'`}</pre>
       <table>
         <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
         <tbody>
@@ -37,11 +43,14 @@ export default function DocsPage() {
 
       <h3>GET /api/v1/jobs/:id</h3>
       <p>Poll for an enrichment result that returned 202.</p>
-      <pre className="demo-result">{`curl https://leadpure.e10d.dev/api/v1/jobs/job_1234567890_1`}</pre>
+      <pre className="demo-result">{`curl ${base}/api/v1/jobs/job_1234567890_1 \\
+  -H 'x-api-key: lp_live_xxx'`}</pre>
 
       <h3>POST /api/v1/keys</h3>
       <p>Generate a new API key.</p>
-      <pre className="demo-result">{`curl -X POST https://leadpure.e10d.dev/api/v1/keys \\\n  -H 'Content-Type: application/json' \\\n  -d '{"email":"you@example.com"}'`}</pre>
+      <pre className="demo-result">{`curl -X POST ${base}/api/v1/keys \\
+  -H 'Content-Type: application/json' \\
+  -d '{"email":"you@example.com"}'`}</pre>
 
       <h2>Rate Limits</h2>
       <p>Free tier: 100 requests per minute. 429 on exceed.</p>

@@ -68,7 +68,7 @@ export default function Home() {
           <div className="how-card">
             <div className="how-step">2</div>
             <h3>Send an email</h3>
-            <p>POST to <code>/v1/enrich</code> with the email or domain you want to look up.</p>
+            <p>POST to <code>/api/v1/enrich</code> with the email or domain you want to look up.</p>
           </div>
           <div className="how-card">
             <div className="how-step">3</div>
